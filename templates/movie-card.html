@@ -1,0 +1,57 @@
+<div class="relative group">
+    <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden transition-transform duration-300 transform group-hover:scale-105">
+        <!-- Poster image with fallback -->
+        <div class="h-64 w-full poster-fallback">
+            {{if .PosterPath}}
+            <img src="{{.PosterPath | imageURL}}"
+                 alt="{{.Title}} poster"
+                 class="h-full w-full object-cover"
+                 onerror="this.parentElement.classList.add('poster-fallback')">
+            {{else}}
+            <span class="text-gray-400">No poster available</span>
+            {{end}}
+        </div>
+
+        <div class="p-4">
+            <!-- Rating Badge -->
+            <div class="absolute top-4 right-4 bg-yellow-500 text-black px-3 py-1 rounded-full text-sm font-bold">
+                ★ {{printf "%.1f" .VoteAverage}}
+            </div>
+
+            <h3 class="text-xl font-bold mb-2">{{.Title}}</h3>
+            <div class="text-sm text-gray-400 mb-2">
+                {{if .ReleaseDate}}<span>{{.ReleaseDate | formatYear}}</span>{{end}}
+                {{if .Genres}}• <span>{{.Genres | genreName}}</span>{{end}}
+            </div>
+            <p class="text-gray-400 text-sm line-clamp-3">
+                {{.Overview}}
+            </p>
+
+            <div class="mt-4 flex justify-between items-center">
+                <button class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg text-sm"
+                        hx-post="/save-movie"
+                        hx-vals='{"title": "{{.Title}}", "year": "{{.ReleaseDate | formatYear}}", "plot": "{{.Overview}}", "rating": "{{.VoteAverage}}"}'
+                        hx-headers='{Content-Type: "application/json"}'
+                        hx-swap="none">
+                    Add to List
+                </button>
+                <a href="#" class="text-gray-400 hover:text-white text-sm">
+                    Details →
+                </a>
+            </div>
+            <div id="toast" class="fixed bottom-4 right-4 hidden p-4 rounded-lg text-white"></div>
+            <script>
+                function showToast(message, type = 'success') {
+                    const toast = document.getElementById('toast');
+                    toast.className = `fixed bottom-4 right-4 p-4 rounded-lg ${
+                        type === 'success' ? 'bg-green-500' :
+                        type === 'error' ? 'bg-red-500' :
+                        'bg-blue-500'}`;
+                    toast.textContent = message;
+                    toast.classList.remove('hidden');
+                    setTimeout(() => toast.classList.add('hidden'), 3000);
+                }
+            </script>
+        </div>
+    </div>
+</div>
